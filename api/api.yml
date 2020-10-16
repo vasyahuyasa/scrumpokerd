@@ -1,0 +1,102 @@
+openapi: "3.0.1"
+info:
+  version: 0.0.1
+paths:
+  /session:
+    post:
+      summary: Create new session
+      operationId: createSession
+      security:
+        - userToken: []
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: title
+          type: string
+          description: Session title
+  /session/{sessionId}:
+    get:
+      summary: Session data
+      operationId: getSession
+      security:
+        - userToken: []
+  /session/{sessionId}/live:
+    get:
+      summary: SSE updates
+      operationId: liveStatus
+      produces: ["text/event-stream"]
+      responses:
+        default:
+          description: List of SSE
+          schema:
+            type: object
+            x-events:
+              added:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+              updated:
+                type: object
+                  properties:
+                    previous:
+                      type: string
+                    newValue:
+                      type: string
+                    updatedAt:
+                      type: string
+                      format: date-time
+  /session/{sessionId}/players:
+    post:
+      summary: Join session
+      operationId: joinSession
+      security:
+        - userToken: []
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: name
+          type: string
+          description: Player name
+  /session/{sessionId}/poll:
+    post:
+      summary: Create new poll
+      operationId: createPoll
+      security:
+        - userToken: []
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: title
+          type: string
+          description: Pole title
+    delete:
+      summary: Stop current poll
+      operationId: stopPoll
+      security:
+        - userToken: []
+  /session/{sessionId}/poll/vote:
+    post:
+      summary: Vote in current poll
+      operationId: vote
+      security:
+        - userToken: []
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: point
+          type: float
+          description: Card value
+components:
+  securitySchemes:
+    userToken:
+      type: apiKey
+      in: header
+      name: X-AUTH-KEY
