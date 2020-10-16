@@ -1,15 +1,15 @@
 package session
 
 const (
-	RankRegular Rank = "regular"
-	RankAdmin        = "admin"
+	PrivelegeRegular Privelege = 0
+	PrivelegeAdmin             = 1
 )
 
-type Rank string
+type PlayerID string
+
+type Privelege int
 
 type Player struct {
-	Name      string
-	PrivateID string
-	PublicID  string
-	Rank      Rank
+	ID   PlayerID
+	Name string
 }

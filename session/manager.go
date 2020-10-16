@@ -1,6 +1,7 @@
 package session
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -9,16 +10,20 @@ type Manager struct {
 	sessions   map[SessionID]Session
 }
 
-func (m *Manager) CreateSession(admin Player, info SessionInfo) {
-	sid := generateSessionID()
+func (m *Manager) CreateSession(id SessionID, title string) error {
+	m.sessionsMu.Lock()
+	defer m.sessionsMu.Unlock()
 
-	s := Session{
-		ID:      sid,
-		Info:    info,
-		Players: []Player{admin},
+	if _, ok := m.sessions[id]; ok {
+		return fmt.Errorf("session with same id %s already exist", id)
 	}
 
-	m.sessionsMu.Lock()
-	m.sessions[sid] = s
-	m.sessionsMu.Unlock()
+	s := Session{
+		ID:    id,
+		Title: title,
+	}
+
+	m.sessions[id] = s
+
+	return nil
 }
