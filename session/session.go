@@ -14,8 +14,8 @@ type Voice struct {
 	Points   float32
 }
 
-type Vote struct {
-	Title   string
+type Poll struct {
+	Topic   string
 	StartAt time.Time
 	Voices  []Voice
 }
@@ -29,7 +29,7 @@ type Session struct {
 	ID          SessionID
 	Title       string
 	Players     []PrivelegedPlayer
-	CurrentVote Vote
+	CurrentPoll Poll
 }
 
 func (s *Session) addPlayer(player Player, priv Privelege) error {

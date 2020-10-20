@@ -1,5 +1,6 @@
 openapi: "3.0.1"
 info:
+  title: Scrum pocker table
   version: 0.0.1
 paths:
   /session:
@@ -8,95 +9,203 @@ paths:
       operationId: createSession
       security:
         - userToken: []
-      consumes:
-        - application/x-www-form-urlencoded
-      parameters:
-        - in: formData
-          name: title
-          type: string
-          description: Session title
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  description: Session title
+                  type: string
+      responses:
+        200:
+          description: OK
+          $ref: '#/components/responses/ResponseSessionID'
   /session/{sessionId}:
     get:
       summary: Session data
       operationId: getSession
       security:
         - userToken: []
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+          description: Session ID
+      responses:
+        200:
+          $ref: '#/components/responses/ResponseSessionInfo'
   /session/{sessionId}/live:
     get:
       summary: SSE updates
       operationId: liveStatus
-      produces: ["text/event-stream"]
       responses:
         default:
           description: List of SSE
-          schema:
-            type: object
-            x-events:
-              added:
+          content:
+            text/event-stream:
+              schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                  createdAt:
-                    type: string
-                    format: date-time
-              updated:
-                type: object
-                  properties:
-                    previous:
-                      type: string
-                    newValue:
-                      type: string
-                    updatedAt:
-                      type: string
-                      format: date-time
+                x-events:
+                  added:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                      createdAt:
+                        type: string
+                        format: date-time
+                  updated:
+                    type: object
+                    properties:
+                      previous:
+                        type: string
+                      newValue:
+                        type: string
+                      updatedAt:
+                        type: string
+                        format: date-time
   /session/{sessionId}/players:
     post:
       summary: Join session
       operationId: joinSession
       security:
         - userToken: []
-      consumes:
-        - application/x-www-form-urlencoded
-      parameters:
-        - in: formData
-          name: name
-          type: string
-          description: Player name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  description: Player name
+                  type: string
+      responses:
+        200:
+          description: OK
   /session/{sessionId}/poll:
     post:
       summary: Create new poll
       operationId: createPoll
       security:
         - userToken: []
-      consumes:
-        - application/x-www-form-urlencoded
-      parameters:
-        - in: formData
-          name: title
-          type: string
-          description: Pole title
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                topic:
+                  description: Poll topic
+                  type: string
+      responses:
+        200:
+          description: OK
     delete:
       summary: Stop current poll
       operationId: stopPoll
       security:
         - userToken: []
+      responses:
+        200:
+          description: OK
   /session/{sessionId}/poll/vote:
     post:
       summary: Vote in current poll
       operationId: vote
       security:
         - userToken: []
-      consumes:
-        - application/x-www-form-urlencoded
-      parameters:
-        - in: formData
-          name: point
-          type: float
-          description: Card value
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                points:
+                  description: Vote for current topic
+                  type: number
+                  format: float
+      responses:
+        200:
+          description: OK
 components:
+  schemas:
+    Player:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Player id
+        name:
+          type: string
+          description: Name of player
+    Poll:
+      type: object
+      properties:
+        title:
+          type: string
+        startAt:
+          type: string
+          format: dateTime
+        voices:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/Voice'
+    Voice:
+      type: object
+      properties:
+        playerID:
+          type: string
+        points:
+          type: number
+          format: float
   securitySchemes:
     userToken:
       type: apiKey
       in: header
       name: X-AUTH-KEY
+  responses:
+    ResponseSessionID:
+      description: Id of created session
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                description: Title of session
+                type: string
+            required:
+              - title
+    ResponseSessionInfo:
+      description:  Session info
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                description: Session ID
+                type: string
+              title:
+                description: Session title
+                type: string
+              players:
+                description: List of players in room
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: object
+                    $ref: '#/components/schemas/Player'
+              poll:
+                type: object
+                $ref: '#/components/schemas/Poll'
