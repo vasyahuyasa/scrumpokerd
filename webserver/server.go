@@ -17,14 +17,6 @@ func NewServer(mgr *session.Manager) *Server {
 	}
 }
 
-/*
-	POST /session - create new session (get id)
-	GET /session/{session_id} - session info (get title, players, topic, stage, epoch)
-	POST /session/{session_id}/players - join session (send name, get id)
-	POST /session/{session_id}/vote - send vote
-	GET /session/{session_id}/online
-*/
-
 func (s *Server) routes() {
 	s.mux.Route("/session", func(r chi.Router) {
 		r.Post("/", createSessionHandle)
