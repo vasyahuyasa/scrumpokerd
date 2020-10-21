@@ -14,11 +14,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                title:
-                  description: Session title
-                  type: string
+              $ref: '#/components/schemas/NewSession'
       responses:
         200:
           description: OK
@@ -43,6 +39,13 @@ paths:
     get:
       summary: SSE updates
       operationId: liveStatus
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+          description: Session ID
       responses:
         default:
           description: List of SSE
@@ -75,16 +78,19 @@ paths:
       operationId: joinSession
       security:
         - userToken: []
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+          description: Session ID
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  description: Player name
-                  type: string
+              $ref: '#/components/schemas/JoinSession'
       responses:
         200:
           description: OK
@@ -94,16 +100,19 @@ paths:
       operationId: createPoll
       security:
         - userToken: []
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+          description: Session ID
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                topic:
-                  description: Poll topic
-                  type: string
+              $ref: '#/components/schemas/CreatePoll'
       responses:
         200:
           description: OK
@@ -112,6 +121,13 @@ paths:
       operationId: stopPoll
       security:
         - userToken: []
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+          description: Session ID
       responses:
         200:
           description: OK
@@ -121,17 +137,19 @@ paths:
       operationId: vote
       security:
         - userToken: []
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+          description: Session ID
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                points:
-                  description: Vote for current topic
-                  type: number
-                  format: float
+              $ref: '#/components/schemas/DoVote'
       responses:
         200:
           description: OK
@@ -159,6 +177,39 @@ components:
           items:
             type: object
             $ref: '#/components/schemas/Voice'
+    NewSession:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          description: Session title
+          type: string
+    JoinSession:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          description: Player name
+          type: string
+    CreatePoll:
+      type: object
+      required:
+        - topic
+      properties:
+        topic:
+          description: Poll topic
+          type: string
+    DoVote:
+      type: object
+      required:
+        - points
+      properties:
+        points:
+          description: Vote for current topic
+          type: number
+          format: float
     Voice:
       type: object
       properties:

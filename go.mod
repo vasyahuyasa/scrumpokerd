@@ -3,6 +3,7 @@ module github.com/vasyahuyasa/scrumpokerd
 go 1.14
 
 require (
+	github.com/deepmap/oapi-codegen v1.3.13
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/satori/go.uuid v1.2.0
